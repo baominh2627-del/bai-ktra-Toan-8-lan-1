@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đề kiểm tra Toán 8 — Đa thức · Tứ giác · Tam giác</title>
+
+    <!-- Liên kết file CSS -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Cấu hình MathJax để nhận diện dấu $ làm công thức toán học -->
+    <script>
+      window.MathJax = {
+        tex: {
+          inlineMath: [
+            ["$", "$"],
+            ["\\(", "\\)"],
+          ],
+          displayMath: [
+            ["$$", "$$"],
+            ["\\[", "\\]"],
+          ],
+        },
+        svg: {
+          fontCache: "global",
+        },
+      };
+    </script>
+
+    <!-- Tải thư viện MathJax -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"
+      id="MathJax-script"
+      async
+    ></script>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="exam-header">
+        <p class="eyebrow">Kiểm tra 45 phút · Môn Toán 8</p>
+        <h1>Đa thức · Tứ giác · Tam giác bằng nhau</h1>
+        <p class="subtitle">
+          20 câu trắc nghiệm · 4 câu đúng/sai · 3 câu trả lời ngắn — thang điểm
+          10
+        </p>
+        <div class="tear"></div>
+      </div>
+
+      <!-- ============ START SCREEN ============ -->
+      <div id="screen-start" class="start-card">
+        <div class="qcard" style="margin-top: 18px">
+          <div class="field">
+            <label for="student-name">Họ và tên học sinh</label>
+            <input id="student-name" type="text" placeholder="Nguyễn Văn A" />
+          </div>
+          <div class="field">
+            <label for="student-class">Lớp</label>
+            <input id="student-class" type="text" placeholder="8A1" />
+          </div>
+          <div class="field">
+            <label for="exam-minutes">Thời gian làm bài (phút)</label>
+            <input
+              id="exam-minutes"
+              type="number"
+              min="5"
+              max="180"
+              value="45"
+            />
+          </div>
+          <div class="btn-row">
+            <button class="btn" id="btn-start">Bắt đầu làm bài</button>
+          </div>
+          <p class="hint">
+            Khi hết giờ, bài làm sẽ tự động được nộp. Kết quả và đáp án sẽ hiển
+            thị ngay sau khi nộp bài.
+          </p>
+        </div>
+      </div>
+
+      <!-- ============ EXAM SCREEN ============ -->
+      <div id="screen-exam" class="hidden">
+        <div class="timerbar">
+          <div class="who">
+            Thí sinh: <b id="tb-name">—</b> &nbsp;·&nbsp; Lớp
+            <b id="tb-class">—</b>
+          </div>
+          <div class="progress-mini" id="tb-progress">0/27 câu đã làm</div>
+          <div class="clock" id="clock">
+            <span class="dot"></span><span id="clock-text">45:00</span>
+          </div>
+        </div>
+
+        <div class="section-title">
+          Phần I — Trắc nghiệm khách quan <span class="pts">4.0 điểm</span>
+        </div>
+        <p class="section-sub">
+          Mỗi câu đúng được 0.2 điểm. Chọn một đáp án duy nhất.
+        </p>
+        <div id="part1-container"></div>
+
+        <div class="section-title">
+          Phần II — Đúng / Sai <span class="pts">4.0 điểm</span>
+        </div>
+        <p class="section-sub">
+          Mỗi câu lớn gồm 4 ý — đúng cả 4 ý được 1.0 điểm; đúng 3 ý: 0.5đ; đúng
+          2 ý: 0.25đ; đúng 1 ý: 0.1đ.
+        </p>
+        <div id="part2-container"></div>
+
+        <div class="section-title">
+          Phần III — Trả lời ngắn <span class="pts">2.0 điểm</span>
+        </div>
+        <p class="section-sub">Điền đáp số vào ô trống.</p>
+        <div id="part3-container"></div>
+
+        <div class="btn-row" style="margin: 26px 4px 0">
+          <button class="btn" id="btn-submit">Nộp bài</button>
+        </div>
+      </div>
+
+      <!-- ============ RESULTS SCREEN ============ -->
+      <div id="screen-results" class="hidden">
+        <div class="score-banner">
+          <div>
+            <div
+              style="
+                font-family: var(--mono);
+                font-size: 12px;
+                opacity: 0.75;
+                margin-bottom: 4px;
+              "
+              id="res-who"
+            >
+              —
+            </div>
+            <div class="num" id="res-score">0.0<span>/10</span></div>
+          </div>
+          <div class="brk" id="res-breakdown"></div>
+        </div>
+        <div id="save-note-box"></div>
+
+        <div class="section-title">Phần I — Chi tiết</div>
+        <div id="review1"></div>
+        <div class="section-title">Phần II — Chi tiết</div>
+        <div id="review2"></div>
+        <div class="section-title">Phần III — Chi tiết</div>
+        <div id="review3"></div>
+
+        <div class="btn-row">
+          <button class="btn secondary" id="btn-restart">
+            Làm lại đề khác
+          </button>
+        </div>
+      </div>
+
+      <footer class="note">
+        Đề Toán 8 · tự động chấm điểm theo đúng barem &amp; lưu kết quả
+      </footer>
+    </div>
+
+    <!-- Liên kết file JS -->
+    <script src="script.js" type="module"></script>
+  </body>
+</html>
