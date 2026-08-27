@@ -10,12 +10,15 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "API_KEY_CUA_BAN",
-  authDomain: "PROJECT_ID.firebaseapp.com",
-  projectId: "PROJECT_ID",
-  storageBucket: "PROJECT_ID.appspot.com",
-  messagingSenderId: "SENDER_ID",
-  appId: "APP_ID",
+  apiKey: "AIzaSyBKIwyzW6Yu9HRfslh1qIztql7CqSkFvKo",
+  authDomain: "luu-submitexam-a05-vl-12.firebaseapp.com",
+  databaseURL:
+    "https://luu-submitexam-a05-vl-12-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "luu-submitexam-a05-vl-12",
+  storageBucket: "luu-submitexam-a05-vl-12.firebasestorage.app",
+  messagingSenderId: "499179183740",
+  appId: "1:499179183740:web:1966d20cbbbc572314b3f9",
+  measurementId: "G-G4EDL71GTK",
 };
 
 const app = initializeApp(firebaseConfig);
