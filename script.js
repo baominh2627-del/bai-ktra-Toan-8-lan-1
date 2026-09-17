@@ -161,7 +161,7 @@ const examData = {
       id: "p1_19",
       q: "Quan sát hình vẽ (Gồm 3 đa giác lồi, 1 đa giác lõm hình mũi tên). Đâu là tứ giác lõm?",
       options: ["Hình 1", "Hình 2", "Hình 3", "Hình 4"],
-      ans: 3,
+      ans: 2,
     },
     {
       id: "p1_20",
