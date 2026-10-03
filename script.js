@@ -573,14 +573,59 @@ async function submitExam() {
   }
 }
 
-// ==========================================
-// KHỞI CHẠY / EVENTS
-// ==========================================
+// Helper tạo nút quay lại trang chủ MTSedu
+function insertBackButton(returnUrl) {
+  const url = returnUrl || 'https://mtsedu.vercel.app';
+  const btn = document.createElement('div');
+  btn.innerHTML = `
+    <a href="${url}" style="
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 9999;
+      background: rgba(0,0,0,0.85);
+      color: white;
+      text-decoration: none;
+      padding: 9px 18px;
+      border-radius: 50px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+    " onmouseover="this.style.background='rgba(0,0,0,1)'" onmouseout="this.style.background='rgba(0,0,0,0.85)'">
+      ← Trang chủ
+    </a>
+  `;
+  document.body.appendChild(btn);
+}
 
-// Helper đọc session MTSedu từ localStorage
+// Helper đọc session MTSedu từ localStorage hoặc URL params
 function getMTSeduSession() {
+  // 1. Đọc từ URL params
+  const params = new URLSearchParams(window.location.search);
+  const urlUsername = params.get('mtsedu_user');
+  const urlName = params.get('mtsedu_name');
+  const urlId = params.get('mtsedu_id');
+  const returnUrl = params.get('mtsedu_return');
+
+  if (urlUsername) {
+    const session = {
+      username: urlUsername,
+      displayName: urlName || urlUsername,
+      id: urlId || ('user_' + urlUsername),
+      returnUrl: returnUrl || 'https://mtsedu.vercel.app'
+    };
+    try { localStorage.setItem('mtsedu_session', JSON.stringify(session)); } catch {}
+    return session;
+  }
+
+  // 2. Đọc từ localStorage
   try {
-    const raw = localStorage.getItem('userSession');
+    const raw = localStorage.getItem('mtsedu_session');
     if (!raw) return null;
     const user = JSON.parse(raw);
     return (user && user.username) ? user : null;
@@ -610,7 +655,11 @@ window.addEventListener("DOMContentLoaded", () => {
     }
     return;
   }
-  // Tự điền tên vào input (nếu form vẫn còn)
+
+  // Đã đăng nhập → chèn nút quay lại
+  insertBackButton(session.returnUrl);
+
+  // Tự điền tên vào input
   const nameInput = document.getElementById("student-name");
   const classInput = document.getElementById("student-class");
   if (nameInput) nameInput.value = session.displayName || session.username;
@@ -625,7 +674,7 @@ btnStart.addEventListener("click", () => {
     studentInfo.name = session.displayName || session.username;
     studentInfo.class = session.username;
   } else {
-    // Fallback: đọc từ input (trường hợp không có session)
+    // Fallback: đọc từ input
     studentInfo.name = document.getElementById("student-name").value.trim();
     studentInfo.class = document.getElementById("student-class").value.trim();
     if (!studentInfo.name || !studentInfo.class) {
