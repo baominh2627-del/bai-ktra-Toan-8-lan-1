@@ -576,13 +576,62 @@ async function submitExam() {
 // ==========================================
 // KHỞI CHẠY / EVENTS
 // ==========================================
-btnStart.addEventListener("click", () => {
-  studentInfo.name = document.getElementById("student-name").value.trim();
-  studentInfo.class = document.getElementById("student-class").value.trim();
 
-  if (!studentInfo.name || !studentInfo.class) {
-    alert("Vui lòng điền đủ Họ tên và Lớp!");
+// Helper đọc session MTSedu từ localStorage
+function getMTSeduSession() {
+  try {
+    const raw = localStorage.getItem('userSession');
+    if (!raw) return null;
+    const user = JSON.parse(raw);
+    return (user && user.username) ? user : null;
+  } catch { return null; }
+}
+
+// Khi tải trang: kiểm tra đăng nhập và tự điền tên nếu đã login
+window.addEventListener("DOMContentLoaded", () => {
+  const session = getMTSeduSession();
+  if (!session) {
+    // Hiện yêu cầu đăng nhập thay vì form nhập tay
+    const startCard = document.querySelector("#screen-start .qcard");
+    if (startCard) {
+      startCard.innerHTML = `
+        <div style="text-align:center;padding:20px;">
+          <div style="font-size:48px;margin-bottom:16px;">🔒</div>
+          <h2 style="font-size:20px;font-weight:700;margin:0 0 8px;">Vui lòng đăng nhập</h2>
+          <p style="color:#666;font-size:15px;margin:0 0 24px;line-height:1.6;">
+            Bạn cần đăng nhập vào <strong>MTS Education</strong> để làm bài thi này.
+          </p>
+          <a href="https://mtsedu.vercel.app/#math" style="display:inline-block;background:#000;color:#fff;text-decoration:none;padding:13px 28px;border-radius:10px;font-size:15px;font-weight:600;">
+            Đăng nhập tại MTS Education →
+          </a>
+          <p style="margin-top:16px;font-size:13px;color:#999;">Tài khoản được cung cấp bởi giáo viên</p>
+        </div>
+      `;
+    }
     return;
+  }
+  // Tự điền tên vào input (nếu form vẫn còn)
+  const nameInput = document.getElementById("student-name");
+  const classInput = document.getElementById("student-class");
+  if (nameInput) nameInput.value = session.displayName || session.username;
+  if (classInput) classInput.value = session.username;
+});
+
+btnStart.addEventListener("click", () => {
+  const session = getMTSeduSession();
+
+  if (session) {
+    // Đã đăng nhập → dùng tên từ session
+    studentInfo.name = session.displayName || session.username;
+    studentInfo.class = session.username;
+  } else {
+    // Fallback: đọc từ input (trường hợp không có session)
+    studentInfo.name = document.getElementById("student-name").value.trim();
+    studentInfo.class = document.getElementById("student-class").value.trim();
+    if (!studentInfo.name || !studentInfo.class) {
+      alert("Vui lòng đăng nhập tại MTS Education trước khi làm bài!");
+      return;
+    }
   }
 
   document.getElementById("tb-name").innerText = studentInfo.name;
