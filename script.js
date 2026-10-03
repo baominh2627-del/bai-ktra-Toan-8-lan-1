@@ -1,28 +1,28 @@
 // ==========================================
-// CẤU HÌNH FIREBASE (Cần thay bằng config thật của bạn)
+// CẤU HÌNH FIREBASE (MTSedu Central Database)
 // ==========================================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import {
-  getFirestore,
-  collection,
-  addDoc,
+  getDatabase,
+  ref,
+  push,
+  update,
   serverTimestamp,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBKIwyzW6Yu9HRfslh1qIztql7CqSkFvKo",
-  authDomain: "luu-submitexam-a05-vl-12.firebaseapp.com",
-  databaseURL:
-    "https://luu-submitexam-a05-vl-12-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "luu-submitexam-a05-vl-12",
-  storageBucket: "luu-submitexam-a05-vl-12.firebasestorage.app",
-  messagingSenderId: "499179183740",
-  appId: "1:499179183740:web:1966d20cbbbc572314b3f9",
-  measurementId: "G-G4EDL71GTK",
+  apiKey: "AIzaSyC8AT2g3vS54-Qco3uU36xYsXN04trj0Yw",
+  authDomain: "mtsedu-85ea3.firebaseapp.com",
+  databaseURL: "https://mtsedu-85ea3-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "mtsedu-85ea3",
+  storageBucket: "mtsedu-85ea3.firebasestorage.app",
+  messagingSenderId: "73617729802",
+  appId: "1:73617729802:web:e7fa3c3c3b9ded7522f2f3",
+  measurementId: "G-JHQC9DSKY5"
 };
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const db = getDatabase(app);
 
 // ==========================================
 // DỮ LIỆU CÂU HỎI (Đề Toán 8 - Đề số 1)
@@ -555,17 +555,39 @@ async function submitExam() {
   // Lưu vào Firebase
   try {
     document.getElementById("save-note-box").innerHTML =
-      `<div class="save-note">⏳ Đang lưu kết quả lên hệ thống...</div>`;
-    await addDoc(collection(db, "exam_results"), {
-      name: studentInfo.name,
-      class: studentInfo.class,
-      score: parseFloat(totalScore),
-      cheatCount: cheatCount,
-      timestamp: serverTimestamp(),
+      `<div class="save-note">⏳ Đang đồng bộ kết quả lên MTSedu...</div>`;
+      
+    const session = getMTSeduSession();
+    const userId = session ? session.id : null;
+    const MA_DE = "TOAN8_LAN1"; // Mã đề tự đặt cho bài thi này
+
+    const resultData = {
+      hoTen: studentInfo.name,
+      lop: studentInfo.class,
+      maDe: MA_DE,
+      tongDiem: parseFloat(totalScore),
+      soLanThoat: cheatCount,
       answers: answers,
-    });
+      userId: userId || "unknown",
+      thoiGianNop: new Date().toISOString(),
+      serverTimestamp: serverTimestamp(),
+    };
+
+    const updates = {};
+    const newResultId = push(ref(db, `testResults/${MA_DE}`)).key;
+
+    // 1. Lưu vào danh sách kết quả của bài thi này
+    updates[`testResults/${MA_DE}/${newResultId}`] = resultData;
+    
+    // 2. Lưu vào hồ sơ người dùng
+    if (userId) {
+      updates[`users/${userId}/results/${newResultId}`] = resultData;
+    }
+
+    await update(ref(db), updates);
+
     document.getElementById("save-note-box").innerHTML =
-      `<div class="save-note ok">✓ Kết quả đã được lưu an toàn trên hệ thống.</div>`;
+      `<div class="save-note ok">✓ Kết quả đã được đồng bộ lên MTSedu thành công.</div>`;
   } catch (e) {
     console.error("Firebase Error:", e);
     document.getElementById("save-note-box").innerHTML =
