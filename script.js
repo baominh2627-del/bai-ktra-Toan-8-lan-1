@@ -681,11 +681,6 @@ window.addEventListener("DOMContentLoaded", () => {
   // Đã đăng nhập → chèn nút quay lại
   insertBackButton(session.returnUrl);
 
-  // Tự điền tên vào input
-  const nameInput = document.getElementById("student-name");
-  const classInput = document.getElementById("student-class");
-  if (nameInput) nameInput.value = session.displayName || session.username;
-  if (classInput) classInput.value = session.username;
 });
 
 btnStart.addEventListener("click", () => {
@@ -696,13 +691,9 @@ btnStart.addEventListener("click", () => {
     studentInfo.name = session.displayName || session.username;
     studentInfo.class = session.username;
   } else {
-    // Fallback: đọc từ input
-    studentInfo.name = document.getElementById("student-name").value.trim();
-    studentInfo.class = document.getElementById("student-class").value.trim();
-    if (!studentInfo.name || !studentInfo.class) {
-      alert("Vui lòng đăng nhập tại MTS Education trước khi làm bài!");
-      return;
-    }
+    // Không cần form — dùng giá trị mặc định
+    studentInfo.name = "Thí sinh";
+    studentInfo.class = "—";
   }
 
   document.getElementById("tb-name").innerText = studentInfo.name;
